@@ -191,6 +191,3 @@ def visualize_inference(overlayed_output):
     
     plt.tight_layout()
     plt.show()
-
-
-infer("image.png")
