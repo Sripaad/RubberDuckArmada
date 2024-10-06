@@ -10,6 +10,7 @@ import store
 import torch
 from PIL import Image
 from transformers import AutoModel, AutoTokenizer, BitsAndBytesConfig
+from predict import infer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -74,9 +75,8 @@ def call_mistral_api(payload: Dict[str, Any]) -> Dict[str, Any]:
     return None
 
 def infer_from(image_path: str):
-    # Implement the infer function or import it from the correct module
     logger.info(f"Inferring from image: {image_path}")
-    # infer(image_path=image_path)
+    infer(image_path=image_path)
 
 def create_prognosis_report(image_path: str) -> str:
     logger.info(f"Creating prognosis report for image: {image_path}")
@@ -84,7 +84,7 @@ def create_prognosis_report(image_path: str) -> str:
     
     prompt = store.prognosis_prompt
     
-    msgs = [{'role': 'user', 'content': [image, prompt]}]
+    msgs = [{'role': 'user', 'content': [prompt, image]}]
     
     logger.info("Generating prognosis report")
     res = model.chat(image=image, msgs=msgs, tokenizer=tokenizer, sampling=True, temperature=1.0, stream=True, max_new_tokens=2048)
@@ -107,10 +107,10 @@ def analyser_api_call(image_path: str) -> Dict[str, Any]:
     payload = create_payload(prompt, [image_path, "output.jpg", "overlay_output.jpg"])
     return call_mistral_api(payload)
 
-if __name__ == "__main__":
-    result = analyser_api_call("image.png")
-    if result:
-        logger.info("Analysis completed successfully")
-        print(result)
-    else:
-        logger.error("Analysis failed")
+# if __name__ == "__main__":
+#     result = analyser_api_call("image.png")
+#     if result:
+#         logger.info("Analysis completed successfully")
+#         print(result)
+#     else:
+#         logger.error("Analysis failed")
